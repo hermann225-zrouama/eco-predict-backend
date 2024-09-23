@@ -54,10 +54,16 @@ jobs:
         run: |
           echo "${{ secrets.KUBE_CONFIG }}" > kubeconfig
           export KUBECONFIG=./kubeconfig
-
+          
+          # Verify the contexts available in the kubeconfig
+          kubectl config get-contexts
+          
+          # Check the current context (this will help debug if the context is correctly set)
+          kubectl config current-context
+          
       - name: Deploy to RKE2 cluster
         run: |
-          kubectl config use-context Default
+          kubectl config use-context Default  # Assurez-vous que "Default" existe dans le fichier kubeconfig
 
           # Update the image in the deployment
           kubectl set image deployment/eco-predict-backend eco-predict-backend=${{ secrets.DOCKER_USERNAME }}/eco-predict-backend:dev-${{ github.sha }} -n eco-predict-backend-space
