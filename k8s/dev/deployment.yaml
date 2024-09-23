@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eco-predict-backend  # Nom du déploiement
+  namespace: eco-predict-backend-space  # Espace de noms
+  labels:
+    app: eco-predict-backend  # Étiquette pour l'application
+spec:
+  replicas: 1  # Nombre de réplicas souhaités
+  selector:
+    matchLabels:
+      app: eco-predict-backend  # Étiquette pour correspondre aux pods
+  template:
+    metadata:
+      labels:
+        app: eco-predict-backend  # Étiquette pour les pods
+    spec:
+      containers:
+        - name: eco-predict-backend  # Nom du conteneur
+          image: ${{ secrets.DOCKER_USERNAME }}/eco-predict-backend:dev-${{ github.sha }}  # Image Docker
+          ports:
+            - containerPort: 8000  # Port écouté par l'application
+          envFrom:
+            - configMapRef:
+                name: eco-predict-backend  # Référence au ConfigMap
+          resources:
+            limits:
+              cpu: "500m"  # Limites de CPU
+              memory: "600Mi"  # Limites de mémoire
+            # requests:
+            #   cpu: "250m"  # Requêtes de CPU
+            #   memory: "300Mi"  # Requêtes de mémoire

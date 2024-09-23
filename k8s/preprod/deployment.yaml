@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: design-predic-deploy #deployment-name  
+  namespace: design-predic-space #namespace 
+  labels:
+    app: design-predicitif-backendd #app-name
+spec:
+  replicas: 2  # Number of desired replicas (you can adjust this based on your needs)
+  selector:
+    matchLabels:
+      app: design-predicitif-backend #app-name
+  template:
+    metadata:
+      labels:
+        app: design-predicitif-backend #app-name
+    spec:
+      containers:
+        - name: design-predicitif-backend #app-name
+          image:  harbor-registry.ocitnetad.ci/design-predicitif/design-predicitif-backend-image:fa0b3ca2 # Replace with your Docker registry URL and image name
+          ports:
+            - containerPort: 8000  # The port your app listens on
+          envFrom:
+          - configMapRef:
+              name: design-predictif-config
+          resources:
+            limits:
+              cpu: "500m" 
+              memory: "1Gi" 
+            requests:
+              cpu: "250m"
+              memory: "500Mi"
