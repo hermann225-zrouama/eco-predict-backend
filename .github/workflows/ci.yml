@@ -49,8 +49,7 @@ jobs:
       # Transfer YAML files to the server
       - name: Transfer YAML files to the server
         run: |
-          scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -r k8s/* ${{ secrets.USERNAME_K8S }}@${{ secrets.IP_K8S }}:~/k8s/
-
+          ls -la
       # Deploy to RKE2 cluster via SSH
       - name: Deploy to RKE2 cluster via SSH
         run: |
