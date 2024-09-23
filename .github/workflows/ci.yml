@@ -34,7 +34,7 @@ jobs:
         run: |
           docker push ${{ secrets.DOCKER_USERNAME }}/eco-predict-backend:dev-${{ github.sha }}
 
-# deploy to my personnal cluster in rke2
+# Deploy to the personal RKE2 cluster
   deploy:
     needs: build
     runs-on: ubuntu-latest
@@ -50,7 +50,11 @@ jobs:
       - name: Deploy to RKE2 cluster via SSH
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.USERNAME_K8S }}@${{ secrets.IP_K8S }} << 'EOF'
-            ls -la
+            # Update the image in the deployment
+            kubectl set image deployment/api-python-backend api-python-backend=${{ secrets.DOCKER_USERNAME }}/eco-predict-backend:dev-${{ github.sha }}
+
+            # Apply the Kubernetes manifests
+            kubectl apply -f k8s/dev/configmap.yaml
+            kubectl apply -f k8s/dev/deployment.yaml
+            kubectl apply -f k8s/dev/service.yaml
           EOF
-
-
