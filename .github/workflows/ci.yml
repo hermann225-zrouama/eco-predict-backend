@@ -51,9 +51,9 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.USERNAME_K8S }}@${{ secrets.IP_K8S }} << 'EOF'
             kubectl set image deployment/api-python-backend api-python-backend=eco-predict-backend:dev-${{ github.sha }}
-            kubectl apply -f /path/to/k8s/configmaps/
-            kubectl apply -f /path/to/k8s/deployments/
-            kubectl apply -f /path/to/k8s/services/
+            kubectl apply -f k8s/dev/configmap.yaml
+            kubectl apply -f k8s/dev/deployment.yaml
+            kubectl apply -f k8s/dev/service.yaml
           EOF
 
 
