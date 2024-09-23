@@ -51,7 +51,7 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.USERNAME_K8S }}@${{ secrets.IP_K8S }} << 'EOF'
             # Update the image in the deployment
-            kubectl set image deployment/api-python-backend api-python-backend=${{ secrets.DOCKER_USERNAME }}/eco-predict-backend:dev-${{ github.sha }}
+            kubectl set image deployment/eco-predict-backend eco-predict-backend=${{ secrets.DOCKER_USERNAME }}/eco-predict-backend:dev-${{ github.sha }}
 
             # Apply the Kubernetes manifests
             kubectl apply -f k8s/dev/configmap.yaml
