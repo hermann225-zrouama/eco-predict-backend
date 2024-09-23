@@ -41,7 +41,7 @@ jobs:
     steps:
       - name: Set up kubeconfig
         run: |
-          echo "${{ secrets.KUBECONFIG }}" > kubeconfig
+          echo "${{ secrets.KUBE_CONFIG }}" > kubeconfig
           export KUBECONFIG=./kubeconfig
 
       - name: Deploy to RKE2 cluster
