@@ -1,4 +1,4 @@
-name: API-PYTHON-BACKEND-DEV
+name: eco-predict-backend-ci-dev
 
 on:
   # Triggers the workflow on push or pull request events for branches starting with "dev-"
@@ -27,9 +27,33 @@ jobs:
       # Build the Docker image
       - name: Build Docker image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/api-python-backend:dev-${{ github.sha }} .
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/eco-predict-backend:dev-${{ github.sha }} .
 
       # Push the Docker image to Docker Hub (or another registry)
       - name: Push Docker image
         run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/api-python-backend:dev-${{ github.sha }}
+          docker push ${{ secrets.DOCKER_USERNAME }}/eco-predict-backend:dev-${{ github.sha }}
+
+# deploy to my personnal cluster in rke2
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_KEY_K8S }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.IP_K8S }} >> ~/.ssh/known_hosts
+
+      - name: Deploy to RKE2 cluster via SSH
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.USERNAME_K8S }}@${{ secrets.IP_K8S }} << 'EOF'
+            kubectl set image deployment/api-python-backend api-python-backend=eco-predict-backend:dev-${{ github.sha }}
+            kubectl apply -f /path/to/k8s/configmaps/
+            kubectl apply -f /path/to/k8s/deployments/
+            kubectl apply -f /path/to/k8s/services/
+          EOF
+
+
