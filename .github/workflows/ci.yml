@@ -1,11 +1,8 @@
 name: eco-predict-backend-ci-dev
 
 on:
-  # Triggers the workflow on push or pull request events for branches starting with "dev-"
   push:
     branches: [ "dev-*" ]
-
-  # Allows manual execution of the workflow from the Actions tab
   workflow_dispatch:
 
 jobs:
@@ -13,28 +10,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout the repository
       - name: Checkout the code
         uses: actions/checkout@v4
 
-      # Set up Docker to build and push the image
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # Build the Docker image
       - name: Build Docker image
         run: |
           docker build -t ${{ secrets.DOCKER_USERNAME }}/eco-predict-backend:dev-${{ github.sha }} .
 
-      # Push the Docker image to Docker Hub (or another registry)
       - name: Push Docker image
         run: |
           docker push ${{ secrets.DOCKER_USERNAME }}/eco-predict-backend:dev-${{ github.sha }}
 
-# Deploy to the personal RKE2 cluster
   deploy:
     needs: build
     runs-on: ubuntu-latest
@@ -54,7 +46,7 @@ jobs:
             kubectl set image deployment/eco-predict-backend eco-predict-backend=${{ secrets.DOCKER_USERNAME }}/eco-predict-backend:dev-${{ github.sha }}
 
             # Apply the Kubernetes manifests
-            kubectl apply -f k8s/dev/configmap.yaml
-            kubectl apply -f k8s/dev/deployment.yaml
-            kubectl apply -f k8s/dev/service.yaml
+            kubectl apply -f k8s/configmaps/configmap.yaml -n eco-predict-backend-space
+            kubectl apply -f k8s/deployments/deployment.yaml -n eco-predict-backend-space
+            kubectl apply -f k8s/services/service.yaml -n eco-predict-backend-space
           EOF
