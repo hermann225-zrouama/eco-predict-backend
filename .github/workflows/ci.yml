@@ -63,8 +63,6 @@ jobs:
           
       - name: Deploy to RKE2 cluster
         run: |
-          kubectl config use-context Default  # Assurez-vous que "Default" existe dans le fichier kubeconfig
-
           # Update the image in the deployment
           kubectl set image deployment/eco-predict-backend eco-predict-backend=${{ secrets.DOCKER_USERNAME }}/eco-predict-backend:dev-${{ github.sha }} -n eco-predict-backend-space
 
