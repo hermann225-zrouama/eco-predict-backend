@@ -89,3 +89,8 @@ async def obtenir_historique():
         historique = json.load(f)
     
     return {"historique": historique[-4:]}
+
+
+@app.get("/")
+async def index():
+    return {"ECO PREDICT"}
