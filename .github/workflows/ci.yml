@@ -35,7 +35,7 @@ jobs:
           docker push ${{ secrets.DOCKER_USERNAME }}/eco-predict-backend:dev-${{ github.sha }}
 
   modifygit:
-    needs: docker
+    needs: build
     runs-on: ubuntu-latest
     steps:
       # Checkout the repository from GitHub
