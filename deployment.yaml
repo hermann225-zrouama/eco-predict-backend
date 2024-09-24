@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: eco-predict-backend  # Nom du conteneur
-          image: ${{ secrets.DOCKER_USERNAME }}/eco-predict-backend:dev-${{ github.sha }}  # Image Docker
+          image: /eco-predict-backend:dev-9acb16d605b6ca8f15f8cc6b7c1801010810f9dd
           ports:
             - containerPort: 8000  # Port écouté par l'application
           envFrom:
