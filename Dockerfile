@@ -15,6 +15,7 @@ RUN pip install --no-cache-dir --upgrade pip \
 # Copier le reste des fichiers de l'application
 COPY . /app
 
+
 # Exposer le port 8000 pour l'application
 EXPOSE 8000
 
