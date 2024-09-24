@@ -79,6 +79,7 @@ jobs:
         with:
           script: |
             const { execSync } = require('child_process');
-            execSync('git push origin main', { stdio: 'inherit' });
+            const branch = process.env.GITHUB_REF_NAME || 'main';
+            execSync(`git push origin ${branch}`, { stdio: 'inherit' });
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Use the GitHub token for authentication
