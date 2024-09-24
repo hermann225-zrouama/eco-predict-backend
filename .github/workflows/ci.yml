@@ -58,6 +58,7 @@ jobs:
 
           # Show the contents of deployment.yaml before changes
           echo "Contents of deployment.yaml before modification:"
+          ls -la
           cat deployment.yaml
 
           # Update the image reference in deployment.yaml
