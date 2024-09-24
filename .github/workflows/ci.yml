@@ -17,7 +17,7 @@ jobs:
       - name: Checkout the code
         uses: actions/checkout@v4
 
-      # Set up Docker to build and push the image
+      # Log in to Docker Hub
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
         with:
@@ -29,7 +29,7 @@ jobs:
         run: |
           docker build -t ${{ secrets.DOCKER_USERNAME }}/eco-predict-backend:dev-${{ github.sha }} .
 
-      # Push the Docker image to Docker Hub (or another registry)
+      # Push the Docker image to Docker Hub
       - name: Push Docker image
         run: |
           docker push ${{ secrets.DOCKER_USERNAME }}/eco-predict-backend:dev-${{ github.sha }}
@@ -37,21 +37,22 @@ jobs:
   modifygit:
     needs: build
     runs-on: ubuntu-latest
+
     steps:
       # Checkout the repository from GitHub
-      - uses: actions/checkout@v3
-        name: Checkout the repository
+      - name: Checkout the repository
+        uses: actions/checkout@v4
         with:
-          repository: 'hermann225-zrouama/eco-predict'  # Repository name
+          repository: 'hermann225-zrouama/eco-predict'
 
       # Modify the image in deployment.yaml
       - name: Modify the image in deployment.yaml
         run: |
-          # Configure Git with a generic name and email (GitHub Actions bot)
+          # Configure Git with a generic name and email for GitHub Actions bot
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git config user.name "github-actions[bot]"
 
-          # Print current directory and contents for debugging
+          # Print current working directory for debugging
           echo "Current working directory:"
           pwd
 
@@ -59,22 +60,23 @@ jobs:
           echo "Contents of deployment.yaml before modification:"
           cat deployment.yaml
 
-          # Modify the image in deployment.yaml with the correct image reference
+          # Update the image reference in deployment.yaml
           sed -i "s+image: .*$+image: ${DOCKER_USERNAME}/eco-predict-backend:dev-${GITHUB_SHA}+g" deployment.yaml
 
           # Show the contents of deployment.yaml after changes
           echo "Contents of deployment.yaml after modification:"
           cat deployment.yaml
 
-          # Stage, commit, and push changes to the repository
+          # Stage and commit changes
           git add deployment.yaml
           git commit -m 'Updated image to ${{ secrets.DOCKER_USERNAME }}/eco-predict-backend:dev-${{ github.sha }} by GitHub Actions: Job changemanifest: ${{ github.run_number }}'
-          git push origin main
-        env:
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}  # Docker Hub username
-          GITHUB_SHA: ${{ github.sha }}  # Current GitHub commit SHA
-        # Authenticate using GitHub Token (no need for username/password)
-      - name: Push changes
-        uses: ad-m/github-push-action@v1
+
+      # Push changes using GitHub Token for authentication
+      - name: Push changes to GitHub
+        uses: actions/github-script@v6
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}  # Use GitHub token for authentication
+          script: |
+            const { execSync } = require('child_process');
+            execSync('git push origin main', { stdio: 'inherit' });
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Use the GitHub token for authentication
