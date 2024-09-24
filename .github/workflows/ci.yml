@@ -57,23 +57,13 @@ jobs:
           echo "Current working directory:"
           pwd
 
-          # Show the contents of deployment.yaml before changes
-          echo "Contents of deployment.yaml before modification:"
-          ls -la
-          cat deployment.yaml
-
           # Update the image reference in deployment.yaml
-          sed -i "s+image: .*$+image: ${DOCKER_USERNAME}/eco-predict-backend:dev-${GITHUB_SHA}+g" deployment.yaml
-
-          # Show the contents of deployment.yaml after changes
-          echo "Contents of deployment.yaml after modification:"
-          cat deployment.yaml
+          sed -i "s+image: .*$+image: ${{ secrets.DOCKER_USERNAME }}/eco-predict-backend:dev-${{ github.sha }}+g" deployment.yaml
 
           # Stage and commit changes
           git add deployment.yaml
           git commit -m 'Updated image to ${{ secrets.DOCKER_USERNAME }}/eco-predict-backend:dev-${{ github.sha }} by GitHub Actions: Job changemanifest: ${{ github.run_number }}'
 
           git push origin main
-      # Push changes using GitHub Token for authentication
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Use the GitHub token for authentication
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}  # Use the GitHub token for authentication
