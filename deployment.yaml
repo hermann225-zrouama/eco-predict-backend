@@ -23,13 +23,13 @@ spec:
           envFrom:
             - configMapRef:
                 name: eco-predict-backend  # Référence au ConfigMap
-          resources:
-            limits:
-              cpu: "500m"  # Limites de CPU
-              memory: "600Mi"  # Limites de mémoire
-            # requests:
-            #   cpu: "250m"  # Requêtes de CPU
-            #   memory: "300Mi"  # Requêtes de mémoire
+          # resources:
+          #   limits:
+          #     cpu: "500m"  # Limites de CPU
+          #     memory: "600Mi"  # Limites de mémoire
+          #   # requests:
+          #   #   cpu: "250m"  # Requêtes de CPU
+          #   #   memory: "300Mi"  # Requêtes de mémoire
 
 
 ---
