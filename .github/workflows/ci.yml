@@ -34,37 +34,47 @@ jobs:
         run: |
           docker push ${{ secrets.DOCKER_USERNAME }}/eco-predict-backend:dev-${{ github.sha }}
 
-  deploy:
-    needs: build
+  modifygit:
+    needs: docker
     runs-on: ubuntu-latest
-
     steps:
-      - name: Set up SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_KEY_K8S }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.IP_K8S }} >> ~/.ssh/known_hosts
+      # Checkout the repository from GitHub
+      - uses: actions/checkout@v3
+        name: Checkout the repository
+        with:
+          repository: 'hermann225-zrouama/eco-predict'  # Repository name
 
-      - name: Create SSH tunnel to Kubernetes API
+      # Modify the image in deployment.yaml
+      - name: Modify the image in deployment.yaml
         run: |
-          ssh -fNT -L 6443:127.0.0.1:6443 ${{ secrets.USERNAME_K8S }}@${{ secrets.IP_K8S }}
+          # Configure Git with a generic name and email (GitHub Actions bot)
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
 
-      - name: Set up kubeconfig
-        run: |
-          echo "${{ secrets.KUBECONFIG }}" > kubeconfig
-          export KUBECONFIG=./kubeconfig
-          
-          # Verify the contexts available in the kubeconfig
-          kubectl config get-contexts
-          
-          # Check the current context (this will help debug if the context is correctly set)
-          kubectl config current-context
-          
-      - name: Deploy to RKE2 cluster
-        run: |
-          # Update the image in the deployment
-          kubectl set image deployment/eco-predict-backend eco-predict-backend=${{ secrets.DOCKER_USERNAME }}/eco-predict-backend:dev-${{ github.sha }} -n eco-predict-backend-space
+          # Print current directory and contents for debugging
+          echo "Current working directory:"
+          pwd
 
-          # Apply the Kubernetes manifests
-          kubectl apply -f k8s/dev/deployment.yaml -n eco-predict-backend-space
+          # Show the contents of deployment.yaml before changes
+          echo "Contents of deployment.yaml before modification:"
+          cat deployment.yaml
+
+          # Modify the image in deployment.yaml with the correct image reference
+          sed -i "s+image: .*$+image: ${DOCKER_USERNAME}/eco-predict-backend:dev-${GITHUB_SHA}+g" deployment.yaml
+
+          # Show the contents of deployment.yaml after changes
+          echo "Contents of deployment.yaml after modification:"
+          cat deployment.yaml
+
+          # Stage, commit, and push changes to the repository
+          git add deployment.yaml
+          git commit -m 'Updated image to ${{ secrets.DOCKER_USERNAME }}/eco-predict-backend:dev-${{ github.sha }} by GitHub Actions: Job changemanifest: ${{ github.run_number }}'
+          git push origin main
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}  # Docker Hub username
+          GITHUB_SHA: ${{ github.sha }}  # Current GitHub commit SHA
+        # Authenticate using GitHub Token (no need for username/password)
+      - name: Push changes
+        uses: ad-m/github-push-action@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}  # Use GitHub token for authentication
