@@ -43,11 +43,8 @@ jobs:
       - name: Checkout the repository
         uses: actions/checkout@v4
         with:
-          repository: 'hermann225-zrouama/eco-predict'
+          repository: 'hermann225-zrouama/eco-predict-backend'
           fetch-depth: 0  # Ensure that all history is fetched
-
-      - name: Show current working directory
-        run: cd .. & ls -R
 
       # Modify the image in deployment.yaml
       - name: Modify the image in deployment.yaml
