@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: eco-predict-backend  # Nom du conteneur
-          image: /eco-predict-backend:dev-9acb16d605b6ca8f15f8cc6b7c1801010810f9dd
+          image: /eco-predict-backend:dev-e0ea36bc9e795e1ff8813c471ee26f560186f94c
           ports:
             - containerPort: 8000  # Port écouté par l'application
           envFrom:
